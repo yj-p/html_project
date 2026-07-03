@@ -77,7 +77,7 @@
             padding: 20px 20px 15px;
             box-shadow: 0 8px 20px rgba(0, 20, 30, 0.1);
             position: relative;
-            transition: 0.2s;
+            transition: 0.2;
             border: 1px solid #eef4fb;
         }
         .beaker {
@@ -108,6 +108,7 @@
             display: flex;
             align-items: flex-end;
             justify-content: center;
+            overflow: hidden;
         }
         .solution-label {
             position: absolute;
@@ -123,10 +124,19 @@
             letter-spacing: 0.3px;
             border: 1px solid rgba(255,255,0.2);
             transition: 0.2s;
+            z-index: 10;
         }
         .crystal-container {
             position: absolute;
             bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+        .solid-container {
+            position: absolute;
+            top: 0;
             left: 0;
             width: 100%;
             height: 100%;
@@ -146,6 +156,21 @@
         }
         .crystal.show {
             opacity: 0.9;
+        }
+        .solid-particle {
+            position: absolute;
+            background: #e0e8f0;
+            background: radial-gradient(circle at 35% 30%, #f4f8ff, #b7c8db);
+            border-radius: 50%;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+            width: 16px;
+            height: 16px;
+            transition: all 0.2s;
+            border: 1px solid rgba(255,255,0.3);
+            opacity: 0;
+        }
+        .solid-particle.show {
+            opacity: 0.8;
         }
         .info-bar {
             display: flex;
@@ -286,13 +311,7 @@
             padding-top: 14px;
         }
         .method-hint {
-            font-size: 0.7rem;
-            color: #3d627f;
-            background: #f5f9ff;
-            padding: 4px 12px;
-            border-radius: 40px;
-            margin-top: 6px;
-            text-align: center;
+            display: none;
         }
         .status-badge.saturated {
             background: #2b5d7a;
@@ -304,6 +323,9 @@
         }
         .badge-solute {
             background: #3d6d8f;
+        }
+        #detailBadge{
+            color:#000000 !important;
         }
         @media (max-width: 700px) {
             .simulator-card { padding: 20px 16px; }
@@ -319,79 +341,73 @@
     </h1>
     <div class="subhead">人教版九年级下册 · 第九单元 ｜ 温度 · 溶剂 · 溶质 互动调控 · 状态实时可见</div>
     <div class="row">
-        <!-- 主显示区 -->
         <div class="main-area">
             <div class="beaker-wrapper">
                 <div class="beaker" id="beaker">
                     <div class="solution" id="solution" style="height: 70%;">
                         <span class="solution-label" id="statusLabel">不饱和</span>
+                        <div class="crystal-container" id="crystalContainer"></div>
+                        <div class="solid-container" id="solidContainer"></div>
                     </div>
-                    <div class="crystal-container" id="crystalContainer"></div>
-                    <!-- 已完全删除悬浮固体容器 -->
                 </div>
             </div>
             <div class="info-bar">
                 <span class="status-badge" id="stateBadge">💧 不饱和溶液</span>
                 <span class="status-badge badge-accent" id="tempBadge">🌡️ 25 °C</span>
-                <span class="status-badge" id="detailBadge">💧 溶剂 100%</span>
+                <span class="status-badge" id="detailBadge">💧 100% 水 · 🧂 葡萄糖</span>
                 <span class="status-badge badge-solute" id="soluteNameBadge">🧂 葡萄糖</span>
             </div>
             <div class="legend">
                 <span><span style="background:#3a8bcb; display:inline-block; width:12px; height:12px; border-radius:4px;"></span> 溶液</span>
                 <span><span style="background:#d9d9e6; display:inline-block; width:12px; height:12px; border-radius:2px;"></span> 底部晶体</span>
+                <span><span style="background:#b7c8db; display:inline-block; width:12px; height:12px; border-radius:50%;"></span> 未溶固体</span>
                 <span id="stateIndicator" style="font-weight:600; background: #f5f9ff; padding:0 12px; border-radius:20px;">⚪ 状态</span>
             </div>
             <div style="margin-top:8px; font-size:0.7rem; color:#2a4b6e; background: #f5f9ff; padding:6px 12px; border-radius:30px; display:flex; flex-wrap:wrap; gap:6px 14px; justify-content:center;">
-                <span>⬇️ 降温 → 饱和析出晶体</span>
-                <span>💧 蒸发 → 饱和析出晶体</span>
-                <span>🧂 加溶质 → 饱和析出晶体</span>
-                <span>⬆️ 升温 → 不饱和晶体溶解</span>
-                <span>💧 加水 → 不饱和晶体溶解</span>
+                <span>⬇️ 降温 → 饱和</span>
+                <span>💧 蒸发 → 饱和</span>
+                <span>🧂 加溶质 → 饱和</span>
+                <span>⬆️ 升温 → 不饱和</span>
+                <span>💧 加水 → 不饱和</span>
             </div>
         </div>
-        <!-- 右侧控制面板 -->
         <div class="control-panel">
-            <!-- 溶质信息（固定为葡萄糖） -->
             <div class="control-group" style="border-bottom: 2px solid #3b8cbf; padding-bottom: 10px;">
                 <div class="control-label" style="font-size:1rem;">🍬 溶质：葡萄糖</div>
                 <div style="font-size:0.75rem; color:#2a4b6e; background: #f5f9ff; padding: 6px 14px; border-radius: 40px;">
                     溶解度随温度升高而增大（温度越低，溶解度越小）
                 </div>
             </div>
-            <!-- 1. 初始状态 -->
             <div class="control-group">
                 <div class="control-label">⚡ 初始状态</div>
                 <div class="btn-group">
                     <button class="btn btn-primary" id="setUnsaturated">不饱和（接近饱和）</button>
                     <button class="btn btn-primary" id="setSaturated">饱和</button>
                 </div>
-                <div class="method-hint">点击切换实验起点</div>
+                <div class="method-hint"></div>
             </div>
-            <!-- 2. 温度 -->
             <div class="control-group">
                 <div class="control-label">🌡️ 改变温度 <span class="temp-indicator" id="tempDisplay">25°C</span></div>
                 <div class="btn-group">
                     <button class="btn btn-warm" id="tempUp">⬆ 升温 (↑)</button>
                     <button class="btn btn-cool" id="tempDown">⬇ 降温 (↓)</button>
                 </div>
-                <div class="method-hint">升温/降温液面高度不变，仅产生底部晶体</div>
+                <div class="method-hint"></div>
             </div>
-            <!-- 3. 溶剂 -->
             <div class="control-group">
                 <div class="control-label">💧 改变溶剂 (水)</div>
                 <div class="btn-group">
                     <button class="btn" id="addWater">➕ 加水 (液面升高)</button>
                     <button class="btn" id="evaporateWater">➖ 蒸发 (液面降低)</button>
                 </div>
-                <div class="method-hint">加水液面上升；蒸发液面下降，析出底部晶体</div>
+                <div class="method-hint"></div>
             </div>
-            <!-- 4. 溶质 -->
             <div class="control-group">
                 <div class="control-label">🧂 改变溶质 (葡萄糖)</div>
                 <div class="btn-group">
                     <button class="btn btn-solute" id="addSolute">➕ 加入溶质</button>
                 </div>
-                <div class="method-hint">加入过量溶质，底部析出晶体</div>
+                <div class="method-hint"></div>
             </div>
             <div style="margin-top: 12px; font-size: 0.7rem; color: #2d577a; text-align: right; opacity: 0.6;">
                 中考核心考点 · 5种转化方法
@@ -404,7 +420,6 @@
 </div>
 <script>
     (function() {
-        // ----- 葡萄糖溶解度曲线 -----
         function getGlucoseSolubility(temp) {
             const minTemp = 0, maxTemp = 90;
             const minSol = 30, maxSol = 500;
@@ -412,7 +427,6 @@
             const solubility = minSol + (maxSol - minSol) * Math.pow(t, 1.8);
             return solubility;
         }
-        // ----- 全局状态 -----
         let temperature = 25;
         let solvent = 100;
         let soluteDissolved = 82;
@@ -422,18 +436,15 @@
             const solubility = getGlucoseSolubility(temperature);
             return (solubility / 100) * solvent;
         }
-        // 核心更新渲染
         function updateSimulator() {
             const maxDissolve = currentMaxDissolve();
             let dissolved = soluteDissolved;
             let undissolved = soluteUndissolved;
-            // 过饱和析出底部晶体
             while (dissolved > maxDissolve && maxDissolve > 0) {
                 const excess = dissolved - maxDissolve;
                 undissolved += excess;
                 dissolved = maxDissolve;
             }
-            // 不饱和自动溶解晶体
             if (undissolved > 0 && dissolved < maxDissolve - 0.01) {
                 const canDissolve = Math.min(undissolved, maxDissolve - dissolved);
                 dissolved += canDissolve;
@@ -448,26 +459,22 @@
             soluteUndissolved = undissolved;
             const saturated = (undissolved > 0.01) || (dissolved >= maxDissolve - 0.01 && maxDissolve > 0);
             isSaturated = saturated;
-
-            // 液面：仅溶剂变化时改变高度，温度不变液面
             const solutionEl = document.getElementById('solution');
             let liquidHeight = 18 + (solvent - 30) / (200 - 30) * 67;
             liquidHeight = Math.min(85, Math.max(18, liquidHeight));
             solutionEl.style.height = liquidHeight + '%';
-
-            // 状态文字更新
             const statusLabel = document.getElementById('statusLabel');
             const stateBadge = document.getElementById('stateBadge');
             const stateIndicator = document.getElementById('stateIndicator');
             if (isSaturated) {
-                statusLabel.innerText = '饱和溶液';
+                statusLabel.innerText = '饱和';
                 statusLabel.style.background = 'rgba(30, 70, 110, 0.7)';
                 stateBadge.innerHTML = '🧊 饱和溶液';
                 stateBadge.className = 'status-badge saturated';
                 stateIndicator.innerHTML = '🔵 饱和';
                 stateIndicator.style.color = '#1f4b74';
             } else {
-                statusLabel.innerText = '不饱和溶液';
+                statusLabel.innerText = '不饱和';
                 statusLabel.style.background = 'rgba(30, 100, 70, 0.7)';
                 stateBadge.innerHTML = '💧 不饱和溶液';
                 stateBadge.className = 'status-badge unsaturated';
@@ -476,10 +483,8 @@
             }
             document.getElementById('tempBadge').innerHTML = `🌡️ ${temperature} °C`;
             document.getElementById('tempDisplay').innerText = `${temperature}°C`;
-            document.getElementById('detailBadge').innerHTML = `💧 ${Math.round(solvent)}% 水 · 🧂 ${Math.round(soluteDissolved)} (溶) ${soluteUndissolved > 0.5 ? '+ '+Math.round(soluteUndissolved)+' 晶体' : ''}`;
+            document.getElementById('detailBadge').innerHTML = `💧 ${Math.round(solvent)}% 水 · 🧂 ${Math.round(soluteDissolved)} (溶) ${soluteUndissolved > 0.5 ? '+ '+Math.round(soluteUndissolved)+' 固体' : ''}`;
             document.getElementById('soluteNameBadge').innerHTML = `🧂 葡萄糖`;
-
-            // 仅渲染底部晶体，彻底删除悬浮固体渲染代码
             const crystalContainer = document.getElementById('crystalContainer');
             crystalContainer.innerHTML = '';
             if (soluteUndissolved > 0.5) {
@@ -501,9 +506,24 @@
                     crystalContainer.appendChild(crystal);
                 }
             }
-            // 悬浮固体容器已移除，无任何渲染逻辑
+            const solidContainer = document.getElementById('solidContainer');
+            solidContainer.innerHTML = '';
+            if (soluteUndissolved > 0.5) {
+                const solidNum = Math.min(20, Math.floor(soluteUndissolved / 2));
+                for (let i = 0; i < solidNum; i++) {
+                    const particle = document.createElement('div');
+                    particle.className = 'solid-particle show';
+                    const size = 8 + Math.random() * 14;
+                    const left = 5 + Math.random() * 85;
+                    const bottom = 5 + Math.random() * 55;
+                    particle.style.width = size + 'px';
+                    particle.style.height = size + 'px';
+                    particle.style.left = left + '%';
+                    particle.style.bottom = bottom + '%';
+                    solidContainer.appendChild(particle);
+                }
+            }
         }
-        // 初始化状态
         function setInitialState(saturated) {
             temperature = 25;
             solvent = 100;
@@ -518,21 +538,18 @@
             }
             updateSimulator();
         }
-        // 改变温度（液面不变）
         function changeTemperature(delta) {
             const newTemp = temperature + delta;
             if (newTemp < 0 || newTemp > 90) return;
             temperature = newTemp;
             updateSimulator();
         }
-        // 改变溶剂（液面同步升降）
         function changeSolvent(delta) {
             const newSolvent = solvent + delta;
             if (newSolvent < 30 || newSolvent > 200) return;
             solvent = newSolvent;
             updateSimulator();
         }
-        // 添加溶质（只生成底部晶体）
         function addSolute() {
             const maxDissolve = currentMaxDissolve();
             if (soluteDissolved < maxDissolve - 0.5) {
@@ -546,7 +563,6 @@
             }
             updateSimulator();
         }
-        // 绑定按钮
         document.getElementById('setUnsaturated').addEventListener('click', () => setInitialState(false));
         document.getElementById('setSaturated').addEventListener('click', () => setInitialState(true));
         document.getElementById('tempUp').addEventListener('click', () => changeTemperature(5));
