@@ -3,20 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>葡萄糖过饱和溶液 · 温度结晶虚拟实验</title>
+  <title>葡萄糖过饱和溶液 · 基于文献数据的结晶模拟</title>
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       background: linear-gradient(145deg, #f5f0eb 0%, #e8e0d8 100%);
       min-height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
-      font-family: 'Segoe UI', Roboto, system-ui, -apple-system, sans-serif;
+      font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
       padding: 16px;
     }
     .card {
@@ -27,7 +23,6 @@
       border-radius: 56px 56px 48px 48px;
       box-shadow: 0 20px 40px rgba(0,0,0,0.25), 0 8px 16px rgba(0,0,0,0.1);
       padding: 28px 28px 40px;
-      transition: box-shadow 0.2s;
       border: 1px solid rgba(255, 242, 230, 0.5);
     }
     h1 {
@@ -40,12 +35,12 @@
       gap: 10px;
       margin-bottom: 8px;
       padding-left: 8px;
+      flex-wrap: wrap;
     }
     h1 small {
-      font-size: 0.95rem;
+      font-size: 0.85rem;
       font-weight: 400;
       color: #7a5f44;
-      margin-left: 6px;
       background: #e8d9cc;
       padding: 0 14px;
       border-radius: 40px;
@@ -61,7 +56,6 @@
       background: rgba(180, 138, 107, 0.08);
       border-radius: 0 20px 20px 0;
     }
-    /* 显示区——烧杯 */
     .display-area {
       background: #cfc1b0;
       background-image: radial-gradient(circle at 20% 30%, #e6d9cb 0%, #b7a494 90%);
@@ -70,10 +64,8 @@
       box-shadow: inset 0 -8px 0 #8a7a68, 0 12px 28px rgba(0,0,0,0.3);
       margin-bottom: 28px;
       position: relative;
-      transition: background 0.2s;
     }
     .beaker {
-      background: #e2f0f9;
       background: linear-gradient(180deg, #eaf5fc 0%, #c8deec 100%);
       border-radius: 0 0 60px 60px;
       border: 6px solid #b3c9d9;
@@ -83,8 +75,6 @@
       position: relative;
       overflow: hidden;
       cursor: pointer;
-      transition: border-color 0.2s;
-      backdrop-filter: blur(2px);
     }
     .beaker::before {
       content: '';
@@ -98,6 +88,7 @@
       filter: blur(3px);
       opacity: 0.6;
       pointer-events: none;
+      z-index: 2;
     }
     .beaker::after {
       content: '';
@@ -110,20 +101,18 @@
       border-radius: 50%;
       filter: blur(6px);
       pointer-events: none;
+      z-index: 2;
     }
-    /* 溶液背景 + 晶体层 */
     .solution {
       position: absolute;
       bottom: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(180, 215, 235, 0.35);
       background: linear-gradient(0deg, #b3d9f0 0%, #d7edfd 70%);
       transition: background 0.25s;
       pointer-events: none;
     }
-    /* 晶体容器——所有晶体绘制在svg上 */
     .crystal-svg {
       position: absolute;
       bottom: 0;
@@ -131,13 +120,13 @@
       width: 100%;
       height: 100%;
       pointer-events: none;
+      z-index: 1;
     }
     .crystal-svg svg {
       display: block;
       width: 100%;
       height: 100%;
     }
-    /* 数据面板 */
     .data-panel {
       display: flex;
       justify-content: space-between;
@@ -148,7 +137,6 @@
       color: #f2ede8;
       margin: 16px 8px 24px 8px;
       box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-      font-weight: 450;
       flex-wrap: wrap;
       gap: 6px 10px;
       border: 1px solid #5e4e3d;
@@ -178,10 +166,8 @@
       opacity: 0.7;
       margin-left: 2px;
     }
-    /* 滑条 */
     .slider-block {
       padding: 8px 10px 12px;
-      background: #e5d7ca;
       border-radius: 60px;
       background: #d6c6b6;
       box-shadow: inset 0 2px 6px #b8a595;
@@ -231,7 +217,6 @@
       border: 2px solid #3f5e7a;
       box-shadow: 0 4px 8px rgba(0,0,0,0.3);
       cursor: grab;
-      transition: 0.07s;
     }
     input[type="range"]::-webkit-slider-thumb:hover {
       transform: scale(1.12);
@@ -251,19 +236,15 @@
       font-weight: 500;
       letter-spacing: 0.5px;
       color: #192f3f;
-      background: #d6e3ed;
-      padding: 2px 8px;
+      background: #cfdde9cc;
+      padding: 0 24px;
       border-radius: 60px;
       display: inline-block;
       margin: 6px auto 0;
-      backdrop-filter: blur(4px);
-      background: #cfdde9cc;
-      padding: 0 24px;
     }
-    /* 浮动标签 */
     .float-note {
-      background: #f0e3d6;
-      border-left: 8px solid #bf7f4a;
+      background: #f7ede3;
+      border-left: 8px solid #bb7a44;
       padding: 14px 18px;
       border-radius: 40px 12px 12px 40px;
       margin: 16px 6px 4px 6px;
@@ -273,13 +254,10 @@
       display: flex;
       align-items: center;
       gap: 10px;
-      transition: 0.2s;
       font-size: 0.98rem;
-      background: #f7ede3;
-      border-left-color: #bb7a44;
     }
     .float-note::before {
-      content: "⚠️";
+      content: "📖";
       font-size: 1.8rem;
       line-height: 1;
     }
@@ -290,6 +268,16 @@
       font-size: 0.75rem;
       opacity: 0.6;
       letter-spacing: 0.3px;
+    }
+    .badge {
+      background: #2d5f3b;
+      color: #e8f5e0;
+      padding: 0 12px;
+      border-radius: 20px;
+      font-size: 0.65rem;
+      font-weight: 400;
+      line-height: 2;
+      margin-left: 8px;
     }
     @media (max-width: 500px) {
       .card { padding: 16px; }
@@ -302,30 +290,27 @@
 <div class="card">
   <h1>
     🧪 葡萄糖过饱和溶液
-    <small>温度结晶</small>
+    <small>基于文献数据的结晶模拟</small>
+    <span class="badge">Alves et al. 2007</span>
   </h1>
-  <div class="subhead">大田红曲酒 · 糖化液模拟 · 拖动滑条观察晶体析出</div>
+  <div class="subhead">拖动滑条观察晶体析出</div>
 
-  <!-- 烧杯显示区 -->
   <div class="display-area">
     <div class="beaker" id="beaker">
       <div class="solution" id="solutionBg"></div>
       <div class="crystal-svg" id="crystalContainer">
         <svg viewBox="0 0 400 220" preserveAspectRatio="xMidYMid meet" id="crystalSvg">
-          <!-- 所有晶体由js动态绘制 -->
         </svg>
       </div>
     </div>
   </div>
 
-  <!-- 温度 + 溶解度数据 -->
   <div class="data-panel" id="dataPanel">
     <div class="data-item"><span class="label">🌡️ 温度</span><span class="value" id="tempDisplay">40</span><span class="unit">°C</span></div>
-    <div class="data-item"><span class="label">🧊 溶解度</span><span class="value" id="solubilityDisplay">80</span><span class="unit">g / 100mL</span></div>
+    <div class="data-item"><span class="label">🧊 溶解度</span><span class="value" id="solubilityDisplay">60.3</span><span class="unit">g / 100g</span></div>
     <div class="data-item"><span class="label">💎 晶体状态</span><span class="value" id="stateDisplay" style="font-size:1rem; background:#4d3d2b; padding:0 14px;">澄清</span></div>
   </div>
 
-  <!-- 滑条 -->
   <div class="slider-block">
     <div class="slider-header">
       <span>❄️ 0°C</span>
@@ -338,23 +323,58 @@
     </div>
   </div>
 
-  <!-- 浮动标签 -->
   <div class="float-note">
-    <span>注意！晶体析出量随温度下降而增加！</span>
+    <span>晶体析出量随温度降低而增加</span>
   </div>
-  <div class="footer-note">⚡ 过饱和溶液 · 大田红曲酒酿造情境 · 交互虚拟实验</div>
+  <div class="footer-note">⚡ 大田红曲酒酿造情境 · 数据驱动型虚拟实验</div>
 </div>
 
 <script>
   (function() {
-    // ----- 状态定义 -----
-    const CRYSTAL_CONFIG = {
-      40: { solubility: 80, state: '澄清',  crystalCount: 0,    description: '无晶体' },
-      20: { solubility: 50, state: '微量析出', crystalCount: 32, description: '零星小点' },
-      0:  { solubility: 35, state: '大量结晶', crystalCount: 120, description: '大量白色晶体' }
+    // ----- 基于文献表2的真实溶解度数据 (Alves et al., 2007) -----
+    // 0°C 为线性外推值 (拟合方程: Sol = 0.674*T + 33.8)
+    const LITERATURE_DATA = {
+      0:  { solubility: 33.8, state: '大量结晶', crystalCount: 140 },
+      10: { solubility: 40.4, state: '结晶增多', crystalCount: 85 },
+      20: { solubility: 47.8, state: '微量析出', crystalCount: 45 },
+      30: { solubility: 53.4, state: '微量析出', crystalCount: 25 },
+      40: { solubility: 60.3, state: '澄清',     crystalCount: 0 }
     };
 
-    // DOM 元素
+    // 插值函数：根据温度获取溶解度、晶体数量、状态
+    function getDataAtTemperature(temp) {
+      const t = Math.round(temp);
+      if (t in LITERATURE_DATA) {
+        return { ...LITERATURE_DATA[t] };
+      }
+
+      const keys = Object.keys(LITERATURE_DATA).map(Number).sort((a,b) => a - b);
+      let lower = keys[0], upper = keys[keys.length - 1];
+      for (let i = 0; i < keys.length - 1; i++) {
+        if (t >= keys[i] && t <= keys[i+1]) {
+          lower = keys[i];
+          upper = keys[i+1];
+          break;
+        }
+      }
+
+      const ratio = (t - lower) / (upper - lower);
+      const sol = LITERATURE_DATA[lower].solubility + ratio * (LITERATURE_DATA[upper].solubility - LITERATURE_DATA[lower].solubility);
+      const count = Math.floor(LITERATURE_DATA[lower].crystalCount + ratio * (LITERATURE_DATA[upper].crystalCount - LITERATURE_DATA[lower].crystalCount));
+      
+      let state = '澄清';
+      if (count >= 120) state = '大量结晶';
+      else if (count >= 60) state = '结晶增多';
+      else if (count >= 10) state = '微量析出';
+      else state = '澄清';
+
+      return {
+        solubility: Math.round(sol * 10) / 10,
+        crystalCount: count,
+        state: state
+      };
+    }
+
     const slider = document.getElementById('tempSlider');
     const tempDisplay = document.getElementById('tempDisplay');
     const solubilityDisplay = document.getElementById('solubilityDisplay');
@@ -363,12 +383,7 @@
     const svg = document.getElementById('crystalSvg');
     const beaker = document.getElementById('beaker');
 
-    // 缓存晶体组
-    let crystalGroup = null;
-
-    // ----- 辅助: 生成晶体SVG (基于count) -----
     function renderCrystals(count, temp) {
-      // 清除旧晶体 (保留其他元素)
       const existingGroup = svg.querySelector('#crystalGroup');
       if (existingGroup) existingGroup.remove();
 
@@ -377,58 +392,47 @@
 
       if (count === 0) {
         svg.appendChild(group);
-        crystalGroup = group;
         return;
       }
 
-      // 根据温度调整晶体大小、颜色、形状 (0°C 更大更白, 20°C 小一些)
       let baseSize = 4;
-      let opacityRange = [0.5, 0.9];
       let color = '#f5f2ed';
+      let opacityRange = [0.5, 0.9];
       if (temp <= 5) {
-        baseSize = 7;
+        baseSize = 8;
         color = '#fafffd';
         opacityRange = [0.7, 1.0];
-      } else if (temp <= 25) {
-        baseSize = 5;
+      } else if (temp <= 20) {
+        baseSize = 5.5;
         color = '#f0ede8';
         opacityRange = [0.5, 0.85];
       } else {
         baseSize = 3.5;
         color = '#e8e3dc';
-        opacityRange = [0.4, 0.7];
+        opacityRange = [0.3, 0.6];
       }
 
-      // 生成晶体位置 —— 底部堆积 + 随机分散
-      const svgW = 400, svgH = 220;
-      // 底部区域 (y: 150~210) 大量堆积, 上方少量悬浮
       for (let i = 0; i < count; i++) {
         let x, y;
         if (i < count * 0.7) {
-          // 底部堆积
           x = 20 + Math.random() * 340;
           y = 150 + Math.random() * 60;
         } else {
-          // 中上部零星
           x = 30 + Math.random() * 320;
           y = 60 + Math.random() * 100;
         }
-        // 边缘修正
         x = Math.min(380, Math.max(10, x));
         y = Math.min(205, Math.max(30, y));
 
-        const size = baseSize * (0.5 + Math.random() * 0.9);
+        const size = baseSize * (0.4 + Math.random() * 0.9);
         const rot = Math.random() * 60 - 30;
         const opacity = opacityRange[0] + Math.random() * (opacityRange[1] - opacityRange[0]);
 
-        // 使用多边形(菱形/方形) 模拟晶体
         const poly = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
-        // 菱形四个点: 基于size
         const half = size * 0.6;
         const points = [
           [0, -half], [half, 0], [0, half], [-half, 0]
         ].map(p => {
-          // 随机扭曲一点形状
           const dx = (Math.random() - 0.5) * 1.2;
           const dy = (Math.random() - 0.5) * 1.2;
           return (p[0] + dx) + ',' + (p[1] + dy);
@@ -440,7 +444,6 @@
         poly.setAttribute('opacity', opacity);
         poly.setAttribute('stroke', '#d6d0c5');
         poly.setAttribute('stroke-width', '0.4');
-        // 随机光泽
         if (Math.random() > 0.7) {
           poly.setAttribute('stroke', '#f5f0ea');
           poly.setAttribute('stroke-width', '0.7');
@@ -448,75 +451,36 @@
         group.appendChild(poly);
       }
 
-      // 额外添加一些细小亮点 (闪烁感)
       if (count > 40) {
-        for (let i = 0; i < 15; i++) {
+        for (let i = 0; i < 12; i++) {
           const x = 20 + Math.random() * 360;
           const y = 50 + Math.random() * 150;
           const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
           dot.setAttribute('cx', x);
           dot.setAttribute('cy', y);
-          dot.setAttribute('r', 1 + Math.random() * 3);
+          dot.setAttribute('r', 1 + Math.random() * 2.5);
           dot.setAttribute('fill', '#fefefa');
-          dot.setAttribute('opacity', 0.3 + Math.random() * 0.3);
+          dot.setAttribute('opacity', 0.2 + Math.random() * 0.3);
           group.appendChild(dot);
         }
       }
 
       svg.appendChild(group);
-      crystalGroup = group;
     }
 
-    // ----- 核心更新函数 -----
     function updateExperiment(temp) {
-      // 限定整数温度
       const t = Math.round(temp);
-      // 更新显示
       tempDisplay.textContent = t;
       tempLabel.textContent = t + ' °C';
 
-      // 根据温度获取数据 (插值)
-      let solubility, state, crystalCount, desc;
-      if (t >= 40) {
-        solubility = 80;
-        state = '澄清';
-        crystalCount = 0;
-        desc = '无晶体';
-      } else if (t <= 0) {
-        solubility = 35;
-        state = '大量结晶';
-        crystalCount = 120;
-        desc = '大量白色晶体';
-      } else if (t <= 20) {
-        // 0~20 之间线性插值: 35~50
-        const ratio = (20 - t) / 20; // 0°C ratio=1, 20°C ratio=0
-        solubility = Math.round(35 + (50 - 35) * (1 - ratio));
-        // 晶体数量 20°C:32, 0°C:120 
-        crystalCount = Math.floor(32 + (120 - 32) * ratio);
-        state = (t < 10) ? '大量结晶' : (t < 18 ? '结晶增多' : '微量析出');
-        if (t >= 15 && t < 20) state = '微量析出';
-        if (t < 10) state = '大量结晶';
-        if (t >= 10 && t < 15) state = '结晶增多';
-        desc = (t < 10) ? '大量白色晶体' : (t < 18 ? '较多晶体' : '零星小点');
-      } else {
-        // 20~40 之间: 50~80
-        const ratio = (40 - t) / 20; // 20°C ratio=1, 40°C ratio=0
-        solubility = Math.round(50 + (80 - 50) * (1 - ratio));
-        crystalCount = Math.floor(32 * ratio);
-        state = (t < 25) ? '微量析出' : '澄清';
-        if (t < 25) state = '微量析出';
-        else state = '澄清';
-        desc = (t < 25) ? '零星小点' : '无晶体';
-      }
+      const data = getDataAtTemperature(t);
+      const solubility = data.solubility;
+      const crystalCount = data.crystalCount;
+      const state = data.state;
 
-      // 边界安全
-      if (t >= 38) { crystalCount = 0; state = '澄清'; desc = '无晶体'; }
-      if (t <= 2) { crystalCount = 120; state = '大量结晶'; desc = '大量白色晶体'; }
-
-      // 更新显示
-      solubilityDisplay.textContent = solubility;
+      solubilityDisplay.textContent = solubility.toFixed(1);
       stateDisplay.textContent = state;
-      // 状态颜色微调
+
       if (state === '澄清') {
         stateDisplay.style.background = '#2d5f3b';
       } else if (state === '大量结晶') {
@@ -525,36 +489,27 @@
         stateDisplay.style.background = '#4d5f4a';
       }
 
-      // 渲染晶体
       renderCrystals(crystalCount, t);
 
-      // 溶液背景微调 (温度高更清亮)
       const sol = document.getElementById('solutionBg');
       if (t > 30) {
-        sol.style.background = 'rgba(180, 215, 235, 0.35)';
         sol.style.background = 'linear-gradient(0deg, #b3d9f0 0%, #d7edfd 70%)';
       } else if (t < 10) {
-        sol.style.background = 'rgba(190, 210, 220, 0.6)';
         sol.style.background = 'linear-gradient(0deg, #aac0ce 0%, #cde0ed 70%)';
       } else {
-        sol.style.background = 'rgba(180, 215, 235, 0.45)';
         sol.style.background = 'linear-gradient(0deg, #b8d4e6 0%, #d7edfd 70%)';
       }
     }
 
-    // ----- 滑条事件 -----
     slider.addEventListener('input', function(e) {
       const val = parseInt(e.target.value, 10);
       updateExperiment(val);
     });
 
-    // ----- 初始化 40°C -----
     slider.value = 40;
     updateExperiment(40);
 
-    // 额外: 点击烧杯随机演示?  (不干扰滑条)
     beaker.addEventListener('click', function() {
-      // 轻提醒：滑动滑条控制温度
       const note = document.querySelector('.float-note');
       note.style.transition = '0.1s';
       note.style.background = '#f5e7d9';
